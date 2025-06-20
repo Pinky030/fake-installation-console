@@ -1,0 +1,8 @@
+[package]
+name = "fake_package_insatll_windows"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rand = "0.9.1"
+colored = "3.0.0"
