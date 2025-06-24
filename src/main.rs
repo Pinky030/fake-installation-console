@@ -39,19 +39,17 @@ fn main() {
 
     let mut finish_idel_tree = false;
 
-    println!("{}> npm {} test-package", user_path.display(), "i".bright_yellow());
+    println!(
+        "{}> npm {} test-package",
+        user_path.display(),
+        "i".bright_yellow()
+    );
     println!("");
 
     loop {
         let elapsed = start_time.elapsed().unwrap_or(Duration::from_secs(0));
         let remaining = duration.saturating_sub(elapsed);
         let stage_one_time = duration / 2;
-
-        // let total_progress_percentage = if duration.as_secs() > 0 {
-        //     (elapsed.as_secs_f64() / duration.as_secs_f64()) * 10.0
-        // } else {
-        //     10.0
-        // };
 
         if elapsed.as_secs_f64() < stage_one_time.as_secs_f64() {
             let stage_one_precentage = elapsed.as_secs_f64() / stage_one_time.as_secs_f64() * 10.0;
@@ -82,22 +80,14 @@ fn main() {
             );
         }
 
-        // print!("Progress: {:.1}%   \r", percentage.min(10.0));
-
-        // io::stdout().flush().unwrap();
-
         if remaining <= Duration::from_secs(0) {
-            // print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
-            print!("\x1B[1A\x1B[2K");
-            stdout().flush().unwrap();
-            // print!("\r");
-            println!("");
-
             break;
         }
-
-        // sleep(Duration::from_millis(100));
     }
+    println!("");
+
+    print!("\x1B[1A\x1B[2K");
+    stdout().flush().unwrap();
 
     println!(
         "up to date, audited {} packages in {}ms",
