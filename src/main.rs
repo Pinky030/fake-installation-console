@@ -4,7 +4,7 @@ use std::{
 };
 
 use colored::Colorize;
-use rand::Rng;
+use rand::{seq::SliceRandom, Rng};
 use std::env;
 
 fn main() {
@@ -14,7 +14,7 @@ fn main() {
         std::path::PathBuf::from("")
     };
 
-    let warning_message: [[String; 3]; 3] = [
+    let mut warning_message: [[String; 3]; 3] = [
         [
             String::from("package: '@eslint/config-array@0.20.1',"),
             String::from("required: { node: '^18.18.0 || ^20.9.0 || >=21.1.0' },"),
@@ -43,8 +43,6 @@ fn main() {
 
     let mut rng = rand::rng();
 
-    let mut finish_idel_tree = false;
-
     println!(
         "{}> npm {} test-package",
         user_path.display(),
@@ -64,10 +62,8 @@ fn main() {
         if finished_packages < num_packages {
             let package_start_time = SystemTime::now();
 
+            let mut finish_idel_tree = false;
             loop {
-                // let package_elapsed = package_start_time
-                //     .elapsed()
-                //     .unwrap_or(Duration::from_secs(0));
                 let package_elapsed = SystemTime::now()
                     .duration_since(package_start_time)
                     .unwrap_or(Duration::from_secs(0));
@@ -76,7 +72,7 @@ fn main() {
 
                 if package_elapsed.as_secs_f64() < stage_one_time.as_secs_f64() {
                     let stage_one_precentage =
-                        elapsed.as_secs_f64() / stage_one_time.as_secs_f64() * 10.0;
+                        package_elapsed.as_secs_f64() / stage_one_time.as_secs_f64() * 10.0;
 
                     print!(
                         "{} - idealTree:@humanfs/node   \r",
@@ -87,11 +83,24 @@ fn main() {
                         print!("\x1B[1A\x1B[2K");
                         print!("\r");
 
-                        for message in &warning_message {
-                            display_warning_message(message);
+                        if rng.random_range(0..10) % 2 == 0 {
+                            let random_number = rng.random_range(0..(warning_message.len()-1));
+
+                            warning_message.shuffle(&mut rng);
+                            let slice = &warning_message[0..random_number];
+
+                            for message in slice {
+                                display_warning_message(message);
+                            }
+
+                            // for message in &warning_message {
+                            //     display_warning_message(message);
+                            // }
                         }
-                        finish_idel_tree = true;
+
                         println!("");
+
+                        finish_idel_tree = true;
                     }
 
                     let stage_two_precentage = ((package_elapsed - stage_one_time).as_secs_f64()
@@ -113,10 +122,6 @@ fn main() {
         }
     }
 
-    // loop {
-
-    // }
-
     println!("");
 
     print!("\x1B[1A\x1B[2K");
@@ -129,14 +134,14 @@ fn main() {
     );
     println!("");
 
-    println!(
-        "{} packages are looking for funding",
-        num_packages
-    );
+    println!("{} packages are looking for funding", num_packages);
     println!("  run `npm fund` for details");
 
     println!("");
-    println!("found {} vulnerabilities", rng.random_range(0..100).to_string().green());
+    println!(
+        "found {} vulnerabilities",
+        rng.random_range(0..30).to_string().green()
+    );
 
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap();
@@ -157,8 +162,6 @@ fn progress_view(_percentage: i32) -> String {
 }
 
 fn display_warning_message(infos: &[String]) {
-    println!("");
-
     println!(
         "npm {} {} Unsupported engine {{",
         "WARN".black().on_yellow(),
